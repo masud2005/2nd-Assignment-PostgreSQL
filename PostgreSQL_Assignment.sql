@@ -151,3 +151,36 @@ SELECT common_name
     LEFT JOIN sightings ON species.species_id = sightings.species_id
     WHERE sighting_id IS NULL;
 
+-- 6. Show the most recent 2 sightings.
+SELECT common_name, sighting_time, name
+    FROM sightings
+    JOIN rangers ON rangers.ranger_id = sightings.ranger_id
+    JOIN species ON species.species_id = sightings.species_id
+    ORDER BY sighting_time DESC
+    LIMIT 2;
+
+-- 7. Update all species discovered before year 1800 to have status 'Historic'.
+UPDATE species
+    SET conservation_status = 'Historic'
+    WHERE extract( YEAR FROM discovery_date ) < 1800;
+
+-- 8. Label each sighting's time of day as 'Morning', 'Afternoon', or 'Evening'. Morning: before 12 PM, Afternoon: 12 PM–5 PM, Evening: after 5 PM
+SELECT sighting_id,
+    CASE
+        WHEN extract( HOUR FROM sighting_time ) < 12 THEN 'Morning'
+        WHEN extract( HOUR FROM sighting_time ) >= 12
+        AND extract( HOUR FROM sighting_time ) < 17 THEN 'Afternoon'
+        ELSE 'Evening'
+    END AS time_of_day
+FROM sightings;
+
+-- 9. Delete rangers who have never sighted any species.
+DELETE FROM rangers
+    WHERE
+    ranger_id IN (
+        SELECT rangers.ranger_id
+        FROM rangers
+            LEFT JOIN sightings ON sightings.ranger_id = rangers.ranger_id
+        WHERE
+            sighting_id IS NULL
+    );
