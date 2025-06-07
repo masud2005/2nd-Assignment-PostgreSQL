@@ -1,4 +1,4 @@
-# 📘 PostgreSQL Questions
+#  PostgreSQL Questions & Answers
 
 ## ১. PostgreSQL কী?
 
